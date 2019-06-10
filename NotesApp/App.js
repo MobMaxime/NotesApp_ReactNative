@@ -1,32 +1,15 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
-import {createStackNavigator,createAppContainer} from 'react-navigation';
-import TaskList from './src/screens/TaskList';
-import AddTask from './src/screens/AddTask';
-import EditTask from './src/screens/EditTask';
+import {Actions, ActionConst, Scene, Stack, Modal, Lightbox, Tabs, Router} from 'react-native-router-flux'
+import taskView from './src/screens';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
-
-
-const AppNavigator = createStackNavigator({
-  Task:TaskList,
-  AddTask:AddTask,
-  EditTask:EditTask
-});
-
-export default createAppContainer(AppNavigator);
-
-
+const Scenes = Actions.create(
+  <Modal key='root' hideNavBar={true}>
+          <Stack key='task' type={ActionConst.RESET} backTitle=" " >
+              <Scene key="taskList" component={taskView.TaskList} title="TO-DO"  />
+              <Scene key="addTask" component={taskView.AddTask} title="Add Task"/>
+              <Scene key="editTask" component={taskView.EditTask} title="Edit Task"/>
+        </Stack>
+  </Modal>
+    
+);
+export default Scenes

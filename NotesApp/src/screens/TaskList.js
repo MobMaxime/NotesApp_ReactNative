@@ -1,86 +1,187 @@
 import React ,{Component} from 'react';
-import {Text,View,Image,StyleSheet,FlatList,ScrollView,Button,TouchableOpacity} from 'react-native';
-import {NEXT_ICON,DELETE_ICON,ADD_ICON} from '../../src/configs/images';
+import {Text,View,Image,StyleSheet,FlatList,TouchableOpacity,Alert} from 'react-native';
+import {EDIT_ICON,MENU_ICON,DELETE_ICON} from '../../src/configs/images';
+import ActionButton from 'react-native-action-button';
+import Icon from 'react-native-vector-icons/Ionicons';
+import SQLite from "react-native-sqlite-storage";
+import localizedString from '../configs/AllStrings';
+import appcolors from '../configs/colors'
+import colors from '../configs/Utils'
+import {Menu,MenuOptions,MenuOption,MenuTrigger,} from 'react-native-popup-menu';
+import {connect} from 'react-redux';
+import globals from '../configs/globals';
+import { Actions} from 'react-native-router-flux';
+
 
 export default class TaskList extends Component{
     constructor(props)
     {
-        super(props);
+        super(props);              
+        const db = SQLite.openDatabase(
+            {
+                name:'TaskDatabase.db',
+                location:'default',
+                createFromLocation:'~www/TaskDatabase.db',
+            },
+            ()=>{},
+            error=>{
+                console.log(error);
+            }            
+        );
         this.state = {
+            db,
+            taskList:[],
+            taskDetail:null,
+            taskCount:0,
+            selectedTaskId:null,
+        }
+    }    
+    static navigationOptions =({navigation})=>{
+        const { params ={}} = navigation.state;
 
+        return{
+            title:localizedString.main_task_header,
+        headerStyle:{
+            backgroundColor:colors.ThemeColor
+        },
+        headerTintColor:appcolors.ThemeWhiteColor,
+        headerLeft:null,
+        // headerRight: (
+        //         <Menu>
+        //         <MenuTrigger><Image style={{width:15,height:15,margin:10}} source={MENU_ICON}/></MenuTrigger>
+        //             <MenuOptions style={{backgroundColor:colors.ThemeColor}}>
+        //                 <MenuOption 
+        //                     onSelect={()=>params.changeTheme()}
+        //                     customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
+        //                     text='Theme1' />
+        //                 <MenuOption 
+        //                     onSelect={()=>colors.ThemeColor=appcolors.ThemeDarkBlueColor}
+        //                     customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
+        //                     text='Theme2' />
+        //             </MenuOptions>
+        //         </Menu>
+        //         ),
         }
     }
-    static navigationOptions={
-        title:'TO-DO',
-        headerStyle:{
-            backgroundColor:'#2196F3'
-        },
-        headerTintColor:'white'
+    componentWillMount()
+    {
+        
+    }
+    static onEnter()
+    {
+        
+    }
+    componentWillReceiveProps()
+    {
+        
+    }
+    componentDidMount(){
+        // this.props.navigation.setParams({
+        //     theme:this.props.theme,
+        //     changeTheme:this.props.changeThemeColor,
+        // })
+        this.getTaskList();
+        Actions.refresh();
+    }
+    getTaskList() {
+        const { db } = this.state;
+        db.transaction(tx => {
+        tx.executeSql('SELECT * FROM TaskList;', [], (tx, results) => {
+            const rows = results.rows;
+            let taskList = [];
+            this.setState({
+                taskCount:rows.length
+            })
+            for (let i = 0; i < rows.length; i++) {
+                taskList.push({
+                ...rows.item(i),
+            });
+            }
+            this.setState({ taskList  });
+        });
+        });
+    }
+   
+    componentWillUnmount()
+    {
+
     }
     clickHandler=()=>{
-        this.props.navigation.navigate('AddTask')
+        
     }
-    clickOnEdit=()=>{
-        this.props.navigation.navigate('EditTask')
+    clickOnEdit=(task)=>{
+        this.props.navigation.navigate('EditTask',{task},)
     }
     render()
     {
-        return(
-            <View>
-                <FlatList data={[
-                        {key:'Task1'},
-                        {key:'Task2'},
-                        {key:'Task3'},
-                        {key:'Task4'},
-                        {key:'Task5'},
-                        {key:'Task6'},
-                        {key:'Task7'},
-                    ]}
-                    renderItem={({item})=>(
-                        <View style={styles.TaskView}>
-                            <TouchableOpacity
-                                onPress={this.clickOnEdit}
-                                activeOpacity={0.7}>
-                                <Image
-                                    source={NEXT_ICON}
-                                    style={styles.leftIcon}/>
-                            </TouchableOpacity>
-                            <Text style={styles.textView}>{item.key}</Text>
-                            <Image style={styles.rightIcon} source={DELETE_ICON}/>
-                        </View>
-                    )}
-                    >
-                    </FlatList>
-                    <View style={styles.MainContainer}>
-                        <TouchableOpacity
-                        onPress={this.clickHandler}
-                            activeOpacity={0.7}
-                            style={styles.TouchableOpacityStyle}>
-                            <Image
-                                source={ADD_ICON}
-                                style={styles.FloatingButtonStyle}/>
-                        </TouchableOpacity>
-                    </View>
-            </View>
-        );
+        const {tasks} = this.state;
+        const {taskList} = this.state;
+        const {taskCount} = this.state;
+        
+        if(taskList.length<1)
+            return(
+                <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+                    <Text>No Task Available</Text>
+                    <ActionButton  buttonColor={colors.ThemeColor} onPress={() => Actions.addTask()} style={{bottom:-20,right:-20}}/> 
+                </View>
+                
+            );
+        else
+        {
+            return(
+                <View style={{flex:1}}>
+                    <FlatList data={taskList}
+                        renderItem={({item})=>(
+                            <View style={styles.TaskView}>
+                                <View style={{flex:1,flexDirection:'column'}}>
+                                    <Text style={{margin:5,fontFamily:globals.FONT_APP,}}>{item.Description}</Text>
+                                    <Text style={{margin:5,fontSize:12,color:'gray',fontFamily:globals.FONT_APP,}}>{item.TaskDate} {item.TaskTime}</Text>
+                                </View>   
+                                <TouchableOpacity 
+                                    activeOpacity={0.7}>
+                                    <Image
+                                        source={DELETE_ICON}
+                                        style={styles.rightIcon}/>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    onPress={() => Actions.editTask({task:item}) }
+                                    activeOpacity={0.7}>
+                                    <Image
+                                        source={EDIT_ICON}
+                                        style={styles.rightIcon}/>
+                                </TouchableOpacity>
+                            </View>
+                        )}>
+                        </FlatList>  
+                                             
+                        <ActionButton  buttonColor={colors.ThemeColor} onPress={()=>Actions.addTask()} style={{bottom:-20,right:-20}}/>          
+                </View>     
+                          
+            );
+        }        
     }
 }
-
+// function mapStateToProps(state){
+//     return{
+//         theme:state.theme
+//     }
+// }
+// function mapDispatchToProps(dispatch){
+//     return{
+//         changeThemeColor:()=>dispatch({type:'THEME1'}),
+//     }
+// }
+//export default connect(mapStateToProps,mapDispatchToProps)(TaskList)
 const styles = StyleSheet.create({
     TaskView:{        
         flex:1,
         flexDirection:'row',
-        height:60,
         margin:2,
         backgroundColor:'white',
         alignItems:'center',
         borderRadius:5,
         borderWidth:1,
-        borderColor:'lightgray'
-    },
-    textView:{
-       margin:10 ,
-       flex:1
+        borderColor:'lightgray',        
     },
     leftIcon:{
         width:40,
@@ -91,6 +192,7 @@ const styles = StyleSheet.create({
         width:20,
         height:20,
         margin:10,
+        //tintColor:colors.ThemeColor,
     },
     addButton:{
         width: 60,  
@@ -102,27 +204,15 @@ const styles = StyleSheet.create({
         right: 10,
     },
     MainContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5F5F5',
-        top:80
+        bottom:60,
+        height:30,
+        right:0,
+        backgroundColor:'transparent'
+      },    
+      actionButtonIcon: {
+        fontSize: 20,
+        height: 22,
+        color: 'white',
+    
       },
-     
-      TouchableOpacityStyle: {
-        position: 'absolute',
-        width: 50,
-        height: 50,
-        alignItems: 'center',
-        justifyContent: 'center',
-        right: 30,
-        bottom: 30,
-      },
-     
-      FloatingButtonStyle: {
-        resizeMode: 'contain',
-        width: 50,
-        height: 50,
-        //backgroundColor:'black'
-      },
-})
+});
