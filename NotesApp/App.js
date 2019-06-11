@@ -15,11 +15,11 @@ const styles = StyleSheet.create({
   TabIconStyle :{
       width:20,
       height:20,
-      tintColor:'#FFFFFF',
+      tintColor:appcolors.ThemeWhiteColor,
   },
   navigationStyle:{
-    color:'#FFFFFF',
-    tintColor:'#FFFFFF',
+    color:appcolors.ThemeWhiteColor,
+    tintColor:appcolors.ThemeWhiteColor,
     backgroundColor:appcolors.ThemeColor,
     elevation:null,
     borderBottomColor:'transparent',
@@ -28,16 +28,15 @@ const styles = StyleSheet.create({
   },
   TabStyle:{
     height:50,
-    
+    backgroundColor:appcolors.ThemeColor
   },
   barTitleStyle:{
-    color:'#FFFFFF',
+    color:appcolors.ThemeWhiteColor,
 
   }
   
 });
 const Scenes = Actions.create(
-  
   <Modal key='root' hideNavBar={false} title='TO-DO' navigationBarStyle={styles.navigationStyle}>
          <Tabs key="taskTab" tabBarPosition="top" titleStyle={styles.barTitleStyle} showLabel={false} showIcon={true} indicatorStyle={{backgroundColor:'white'}} tabBarStyle={styles.TabStyle}>  
                 <Stack key='Tab1' icon={taskIcon}  hideNavBar={false} >

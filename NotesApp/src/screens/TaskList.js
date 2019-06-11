@@ -1,5 +1,5 @@
 import React ,{Component} from 'react';
-import {Text,View,Image,StyleSheet,FlatList,TouchableOpacity,Alert} from 'react-native';
+import {Text,View,Image,StyleSheet,FlatList,TouchableOpacity,StatusBar} from 'react-native';
 import {EDIT_ICON,MENU_ICON,DELETE_ICON} from '../../src/configs/images';
 import ActionButton from 'react-native-action-button';
 import SQLite from "react-native-sqlite-storage";
@@ -121,10 +121,12 @@ export default class TaskList extends Component{
     render()
     {
         const {taskList} = this.state;
+        const AppStatusBar = () => (<StatusBar translucent barStyle="light-content" />);
 
         if(taskList.length<1)
             return(
                 <View style={styles.containerMain}>
+                     <AppStatusBar />
                     <Text style={styles.textNoData}>No Task Available</Text>
                     {this.renderActionButton()}
                 </View>
@@ -133,6 +135,7 @@ export default class TaskList extends Component{
         {
             return(
                 <View style={styles.containerMain}>
+                    <AppStatusBar />
                     <FlatList data={taskList}
                         renderItem={({item})=>(
                             <View style={styles.TaskView}>
@@ -141,7 +144,7 @@ export default class TaskList extends Component{
                                     <Text style={styles.listItemText}>{item.TaskDate} {item.TaskTime}</Text>
                                 </View>   
                                 <TouchableOpacity 
-                                    onPress={() => {database.clickOnDelete(item.TaskId),Actions.refresh({entered:new Date()})}}
+                                    onPress={() => {database.clickOnDelete(item.TaskId); Actions.refresh({entered:new Date()})}}
                                     activeOpacity={0.7}>
                                     <Image
                                         source={DELETE_ICON}
