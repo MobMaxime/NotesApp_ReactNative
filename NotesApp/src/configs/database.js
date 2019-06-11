@@ -2,6 +2,7 @@ import React,{Component} from 'react';
 import SQLite from "react-native-sqlite-storage";
 import {Alert} from 'react-native';
 import localizedString from '../configs/AllStrings'
+import { Actions } from 'react-native-router-flux';
 export default class  dbOperation extends Component
 {
     static getTaskList() {
@@ -49,7 +50,7 @@ export default class  dbOperation extends Component
                         if(results.rowsAffected > 0)
                         {
                             Alert.alert(localizedString.txt_success,localizedString.txt_delete_task,[
-                                {text:localizedString.txt_ok},
+                                {text:localizedString.txt_ok, onPress: () => Actions.pop()},
                             ]); 
                         }
                         else

@@ -18,33 +18,46 @@ export default class EditTask extends Component{
             isDateTimePickerVisible:false,
             isTimePickerVisible:false,
             pickeMode:null,
+            pickerTitle:null,
             Description:'',
             TaskId:'',
-            Description:'',
             taskDate:'',
             taskTime:'',
             checked:false,
         }
     }
     static navigationOptions=({navigation})=>{
+        const { params = {} } = navigation.state;
+        let SceneTitle = (params.isEditMode) ? localizedString.edit_task_header : localizedString.add_task_header
         return{
-            title:localizedString.edit_task_header,
+            title: SceneTitle,
             headerStyle:{
                 backgroundColor:appcolors.ThemeColor
+            },
+            headerTitleStyle:{
+                fontFamily:globals.FONT_LATO_BOLD,
+                fontSize: 20
             },
             headerTintColor:appcolors.ThemeWhiteColor,
             headerLeft: (
                 <TouchableOpacity onPress={()=>Actions.pop()} >
-                    <Image source={CANCEL_ICON} style={{width:20,height:20,margin:10}}/>
+                    <Image source={CANCEL_ICON} style={{width:22,height:22,marginLeft:15, marginRight:5}}/>
                 </TouchableOpacity>)
             }
         };
     componentDidMount(){
+        this.props.navigation.setParams({ isEditMode: this.props.isEdit });
+        let isTaskAvailable = this.props.task != null
+        let taskId = (isTaskAvailable)&&(this.props.task.TaskId);
+        let taskDate = (isTaskAvailable)?(this.props.task.TaskDate):Moment(new Date()).format('DD MMM, YYYY');
+        let taskTime = (isTaskAvailable)?(this.props.task.TaskTime):Moment(new Date()).format("h:mm A");
+        let taskDescription = (isTaskAvailable)&&(this.props.task.Description);
+
         this.setState({
-            TaskId:this.props.task.TaskId,
-            taskDate:this.props.task.TaskDate,
-            taskTime:this.props.task.TaskTime,
-            Description:this.props.task.Description,
+            TaskId:taskId,
+            taskDate:taskDate,
+            taskTime:taskTime,
+            Description:taskDescription
         })
     }
     componentWillUnmount()
@@ -55,6 +68,7 @@ export default class EditTask extends Component{
     showDateTimePicker=()=>{
         this.setState({
             pickeMode:'date',
+            pickerTitle:localizedString.txt_pick_date,
             isDateTimePickerVisible:true
         });
     }    
@@ -67,7 +81,7 @@ export default class EditTask extends Component{
         if(this.state.pickeMode=='date')
         {
             this.setState({            
-                taskDate:Moment(dateTime).format('DD-MM-YYYY'),
+                taskDate:Moment(dateTime).format('DD MMM, YYYY'),
             });
         }else
         {
@@ -80,6 +94,7 @@ export default class EditTask extends Component{
     showTimePicker=()=>{
         this.setState({
             pickeMode:'time',
+            pickerTitle:localizedString.txt_pick_time,
             isDateTimePickerVisible:true
         });
     }
@@ -93,96 +108,132 @@ export default class EditTask extends Component{
             const { Description } = this.state;
             const { taskDate } = this.state;
             const { taskTime } = this.state;
-            database.updateTaskData(TaskId,Description,taskDate,taskTime);    
-            this.props.navigation.goBack();
+            if(this.props.isEdit)
+                database.updateTaskData(TaskId,Description,taskDate,taskTime);
+            else
+                database.insertTaskData(Description,taskDate,taskTime);    
+            Actions.pop();
         }
     }
     clickOnDelete=(id)=>{
-        let val;
-        val = database.clickOnDelete(id);    
-        this.props.navigation.goBack();        
+        database.clickOnDelete(id);    
+   }
+
+    renderCheckBox(){
+        return(
+        <CheckBox containerStyle={styles.checkBox} iconRight size={28} 
+        checkedColor={appcolors.ThemeWhiteColor} 
+        textStyle={styles.checkBoxTitle} title={localizedString.txt_mark_status} 
+        checked={this.state.checked} onPress={()=>this.setState({checked:!this.state.checked})}/>);
     }
+
     render()
     {
         return(
-            <View>
+            <View style={styles.container}>
+                {this.props.isEdit && this.renderCheckBox()}
                 <View style={styles.taskView}>
-                    <CheckBox title={localizedString.txt_mark_status} checked={this.state.checked} onPress={()=>this.setState({checked:!this.state.checked})}/>
-                    <Text>Task</Text>
-                    <TextInput   defaultValue={this.state.Description} onChangeText={(value) => this.setState({ Description: value })} style={styles.textView} placeholder='enter new task'/>
-                    <View style={{marginTop:20}}>
-                        <View style={{flexDirection:'row',justifyContent:'center'}}>
-                            <Text style={{flex:1,fontFamily:globals.FONT_APP,}}>{this.state.taskDate}</Text>
-                            <TouchableOpacity
-                                onPress={this.showDateTimePicker}
-                                activeOpacity={0.7}>
+                    <Text style={styles.taskTitle}>Task</Text>
+                    <TextInput style={styles.textView} defaultValue={this.state.Description} onChangeText={(value) => this.setState({ Description: value })} placeholder={localizedString.txt_enter_task} placeholderTextColor={appcolors.ThemeLightGrayColor} />
+                    <View style={{marginTop:10}}>
+                        <TouchableOpacity style={styles.taskButton} onPress={this.showDateTimePicker} activeOpacity={0.7}>
+                            <Text style={styles.taskText}>{this.state.taskDate}</Text>
                                 <Image
                                     source={DATE_ICON}
                                     style={styles.taskIcon}/>
                             </TouchableOpacity>                            
-                        </View>
-                        <View style={{flexDirection:'row',justifyContent:'center',marginTop:20}}>
-                            <Text style={{flex:1,fontFamily:globals.FONT_APP,}}>{this.state.taskTime}</Text>
-                            <TouchableOpacity
-                                onPress={this.showTimePicker}
-                                activeOpacity={0.7}>
+                        <TouchableOpacity style={styles.taskButton} onPress={this.showTimePicker} activeOpacity={0.7}>
+                            <Text style={styles.taskText}>{this.state.taskTime}</Text>
                                 <Image
                                     source={TIME_ICON}
                                     style={styles.taskIcon}/>
-                            </TouchableOpacity>
-                        </View>  
+                        </TouchableOpacity>  
                         <DateTimePicker 
                             isVisible={this.state.isDateTimePickerVisible}
                             onCancel={this.hideDateTimePicker}
                             onConfirm={this.handleDatePicked}
-                            mode={this.state.pickeMode}        
+                            mode={this.state.pickeMode}
+                            titleIOS={this.state.pickerTitle}        
                         />                      
                     </View>   
                 </View>
-            <View style={{flexDirection:'row',}}>
+            
                 <TouchableOpacity style={styles.button} onPress={this.clickOnSave}> 
-                    <View >
-                        <Text style={{color:'white',fontFamily:globals.FONT_APP}}>Save</Text>
-                    </View>
+                   <Text style={styles.buttonText}>Save</Text>
                 </TouchableOpacity > 
-                <TouchableOpacity style={styles.button} onPress={()=>database.clickOnDelete(this.state.TaskId)}>
-                    <View >
-                        <Text style={{color:'white',fontFamily:globals.FONT_APP}}>Delete</Text>
-                    </View>
-                </TouchableOpacity>
-            </View> 
+                {this.props.isEdit &&
+                <TouchableOpacity style={styles.button} onPress={()=>this.clickOnDelete(this.state.TaskId)}>
+                    <Text style={styles.buttonText}>Delete</Text>
+                </TouchableOpacity>}
         </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
+    container:{
+        backgroundColor: appcolors.ThemeBackgroundColor,
+        flex:1
+    },
+    checkBox:{
+        backgroundColor: 'transparent', 
+        borderColor:'transparent' 
+    },
+    checkBoxTitle:{
+        flex:1, 
+        fontFamily:globals.FONT_APP, 
+        fontSize: 17, 
+        color: appcolors.ThemeWhiteColor,
+        marginLeft: -10
+    },
     taskView:{
         margin:10,
         flexDirection:'column'
     },
     button: {
-        flex:1,
         backgroundColor: appcolors.ThemeColor,
-        height:30,
-        width:'40%',
+        height:36,
         margin:10,
-        alignItems:'center',
-        justifyContent: 'center',
-        borderRadius: 5,      
+        borderRadius: 18,
+        justifyContent:'center',
+        alignItems:'center'
+      },
+      buttonText:{
+        color:appcolors.ThemeWhiteColor,
+        fontFamily:globals.FONT_LATO_BOLD,
+        fontSize: 15
+      },
+      taskButton:{
+        flexDirection:'row',
+        justifyContent:'center',
+        marginTop:20,
+        height: 40
+      },
+      taskText:{
+        flex:1,
+        fontFamily:globals.FONT_APP,
+        fontSize: 16,
+        color: appcolors.ThemeWhiteColor
       },
       taskIcon:{
         width:20,
         height:20,
         justifyContent:'center',
-        tintColor:appcolors.ThemeColor
+        tintColor:appcolors.ThemeWhiteColor
+    },
+    taskTitle:{
+        color:appcolors.ThemeLightGrayColor,
+        fontFamily:globals.FONT_LATO_BOLD,
+        fontSize: 19
     },
     textView:{
-        borderColor:'lightgray',
-        borderWidth:1,
-        borderRadius:5,
+        borderBottomWidth: 1,
+        borderBottomColor: appcolors.ThemeLightGrayColor,
         height:40,
-        paddingLeft:10,
+        paddingLeft:8,
+        marginTop:5,
         fontFamily:globals.FONT_APP,
+        fontSize: 16,
+        color:appcolors.ThemeWhiteColor
     },
 })

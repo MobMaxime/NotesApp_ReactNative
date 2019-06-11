@@ -2,17 +2,13 @@ import React ,{Component} from 'react';
 import {Text,View,Image,StyleSheet,FlatList,TouchableOpacity,Alert} from 'react-native';
 import {EDIT_ICON,MENU_ICON,DELETE_ICON} from '../../src/configs/images';
 import ActionButton from 'react-native-action-button';
-import Icon from 'react-native-vector-icons/Ionicons';
 import SQLite from "react-native-sqlite-storage";
 import localizedString from '../configs/AllStrings';
 import appcolors from '../configs/colors'
-import colors from '../configs/Utils'
 import {Menu,MenuOptions,MenuOption,MenuTrigger} from 'react-native-popup-menu';
-import {connect} from 'react-redux';
 import globals from '../configs/globals';
 import database from '../configs/database'
 import { Actions} from 'react-native-router-flux';
-
 
 export default class TaskList extends Component{
     constructor(props)
@@ -43,21 +39,21 @@ export default class TaskList extends Component{
         return{
             title:localizedString.main_task_header,
         headerStyle:{
-            backgroundColor:colors.ThemeColor
+            backgroundColor:appcolors.ThemeColor
         },
         headerTintColor:appcolors.ThemeWhiteColor,
         headerLeft:null,
         headerRight: (
                 <Menu>
                 <MenuTrigger><Image style={{width:15,height:15,margin:10}} source={MENU_ICON}/></MenuTrigger>
-                    <MenuOptions style={{backgroundColor:colors.ThemeColor}}>
+                    <MenuOptions style={{backgroundColor:appcolors.ThemeColor}}>
                         <MenuOption 
                             customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
-                            text='Theme1' />
+                            text={localizedString.txt_light_theme} />
                         <MenuOption 
-                            onSelect={()=>colors.ThemeColor=appcolors.ThemeDarkBlueColor}
+                            onSelect={()=>{Actions.refresh();}}
                             customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
-                            text='Theme2' />
+                            text={localizedString.txt_dark_theme} />
                     </MenuOptions>
                 </Menu>
                 ),
@@ -114,33 +110,35 @@ export default class TaskList extends Component{
     clickHandler=()=>{
         
     }
-    clickOnEdit=(task)=>{
-        this.props.navigation.navigate('EditTask',{task},)
+    clickOnEdit=(taskItem)=>{
+        Actions.editTask({task:taskItem, isEdit:true});
     }
+
+    renderActionButton(){
+        return(<ActionButton buttonColor={appcolors.ThemeColor} onPress={() => Actions.editTask({isEdit:false})} style={styles.bottomButton}/>);
+    }
+
     render()
     {
-        const {tasks} = this.state;
         const {taskList} = this.state;
-        const {taskCount} = this.state;
-        
+
         if(taskList.length<1)
             return(
-                <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-                    <Text>No Task Available</Text>
-                    <ActionButton  buttonColor={colors.ThemeColor} onPress={() => Actions.addTask()} style={{bottom:-20,right:-20}}/> 
+                <View style={styles.containerMain}>
+                    <Text style={styles.textNoData}>No Task Available</Text>
+                    {this.renderActionButton()}
                 </View>
-                
             );
         else
         {
             return(
-                <View style={{flex:1}}>
+                <View style={styles.containerMain}>
                     <FlatList data={taskList}
                         renderItem={({item})=>(
                             <View style={styles.TaskView}>
-                                <View style={{flex:1,flexDirection:'column'}}>
-                                    <Text style={{margin:5,fontFamily:globals.FONT_APP,}}>{item.Description}</Text>
-                                    <Text style={{margin:5,fontSize:12,color:'gray',fontFamily:globals.FONT_APP,}}>{item.TaskDate} {item.TaskTime}</Text>
+                                <View style={styles.listTextContainer}>
+                                    <Text style={styles.listItemText}>{item.Description}</Text>
+                                    <Text style={styles.listItemText}>{item.TaskDate} {item.TaskTime}</Text>
                                 </View>   
                                 <TouchableOpacity 
                                     onPress={() => {database.clickOnDelete(item.TaskId),Actions.refresh({entered:new Date()})}}
@@ -150,7 +148,7 @@ export default class TaskList extends Component{
                                         style={styles.rightIcon}/>
                                 </TouchableOpacity>
                                 <TouchableOpacity 
-                                    onPress={() => Actions.editTask({task:item}) }
+                                    onPress={()=>this.clickOnEdit(item)}
                                     activeOpacity={0.7}>
                                     <Image
                                         source={EDIT_ICON}
@@ -159,8 +157,7 @@ export default class TaskList extends Component{
                             </View>
                         )}>
                         </FlatList>  
-                                             
-                        <ActionButton  buttonColor={colors.ThemeColor} onPress={()=>Actions.addTask()} style={{bottom:-20,right:-20}}/>          
+                        {this.renderActionButton()}        
                 </View>     
                           
             );
@@ -179,15 +176,40 @@ export default class TaskList extends Component{
 // }
 //export default connect(mapStateToProps,mapDispatchToProps)(TaskList)
 const styles = StyleSheet.create({
+    containerMain:{
+        flex:1,
+        justifyContent:'center',
+        backgroundColor:appcolors.ThemeBackgroundColor
+    },
+    textNoData:{
+        color:appcolors.ThemeWhiteColor,
+        textAlign:'center',
+        fontFamily:globals.FONT_LATO_REGULAR,
+        fontSize:16
+    },
+    listTextContainer:{
+        flex:1,
+        flexDirection:'column'
+    },
+    listItemText:{
+        margin:5,
+        fontSize:15,
+        color:appcolors.ThemeWhiteColor,
+        fontFamily:globals.FONT_APP
+    },
+    bottomButton:{
+        bottom:-20,
+        right:-20
+    },
     TaskView:{        
         flex:1,
         flexDirection:'row',
-        margin:2,
-        backgroundColor:'white',
+        margin:5,
+        backgroundColor:appcolors.ThemeColor,
         alignItems:'center',
         borderRadius:5,
         borderWidth:1,
-        borderColor:'lightgray',        
+        borderColor:appcolors.ThemeLightGrayColor,        
     },
     leftIcon:{
         width:40,
@@ -198,13 +220,13 @@ const styles = StyleSheet.create({
         width:20,
         height:20,
         margin:10,
-        //tintColor:colors.ThemeColor,
+        tintColor:appcolors.ThemeWhiteColor
     },
     addButton:{
         width: 60,  
         height: 60,   
         borderRadius: 30,            
-        backgroundColor: '#ee6e73',                                    
+        backgroundColor: appcolors.ThemeColor,                                    
         position: 'absolute',                                          
         bottom: 10,                                                    
         right: 10,
@@ -218,7 +240,7 @@ const styles = StyleSheet.create({
       actionButtonIcon: {
         fontSize: 20,
         height: 22,
-        color: 'white',
+        color: appcolors.ThemeWhiteColor,
     
       },
 });

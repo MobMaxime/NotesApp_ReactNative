@@ -17,8 +17,12 @@ const strings = new LocalizedStrings({
         txt_failled:'Failed',
         txt_yes:'Yes',
         txt_no:'No',
-        txt_mark_status:'Mark as Completed',
-
+        txt_mark_status:'Mark as Done',
+        txt_enter_task:"Enter new task",
+        txt_pick_date:"Pick a Date",
+        txt_pick_time:"Pick a Time",
+        txt_light_theme:"Light Theme",
+        txt_dark_theme:"Dark Theme",
     }
 });
 
