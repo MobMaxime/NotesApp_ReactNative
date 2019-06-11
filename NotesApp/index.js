@@ -4,7 +4,6 @@
 import React from 'react';
 import {AppRegistry} from 'react-native';
 import App from './App';
-import Task from './src/screens/TaskList';
 import {name as appName} from './app.json';
 import { createStore ,applyMiddleware} from 'redux';
 import {createLogger} from 'redux-logger';
