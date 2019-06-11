@@ -8,6 +8,7 @@ import appcolors from '../configs/colors'
 import database from '../configs/database'
 import globals from '../configs/globals';
 import { Actions } from 'react-native-router-flux';
+import {CheckBox} from 'react-native-elements';
 
 export default class EditTask extends Component{
     constructor(props)
@@ -22,6 +23,7 @@ export default class EditTask extends Component{
             Description:'',
             taskDate:'',
             taskTime:'',
+            checked:false,
         }
     }
     static navigationOptions=({navigation})=>{
@@ -105,6 +107,7 @@ export default class EditTask extends Component{
         return(
             <View>
                 <View style={styles.taskView}>
+                    <CheckBox title={localizedString.txt_mark_status} checked={this.state.checked} onPress={()=>this.setState({checked:!this.state.checked})}/>
                     <Text>Task</Text>
                     <TextInput   defaultValue={this.state.Description} onChangeText={(value) => this.setState({ Description: value })} style={styles.textView} placeholder='enter new task'/>
                     <View style={{marginTop:20}}>

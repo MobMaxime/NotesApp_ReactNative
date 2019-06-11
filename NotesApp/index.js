@@ -12,6 +12,7 @@ import {appReducer} from './src/reducers';
 import {Router} from 'react-native-router-flux';
 import { connect,Provider } from 'react-redux';
 import thunk from 'redux-thunk';
+import {MenuProvider} from 'react-native-popup-menu';
 
 const loggerMiddleware = createLogger()
 const ConnectedRouter = connect()(Router);
@@ -21,9 +22,12 @@ export default class ReduxApp extends React.Component{
     render()
     {
         return(
-            <Provider store={store}>
-                <ConnectedRouter scenes={App}/>
-            </Provider>
+            <MenuProvider>
+                <Provider store={store}>
+                    <ConnectedRouter scenes={App}/>
+                </Provider>
+            </MenuProvider>
+            
         );
     }
 }

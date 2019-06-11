@@ -17,6 +17,7 @@ const strings = new LocalizedStrings({
         txt_failled:'Failed',
         txt_yes:'Yes',
         txt_no:'No',
+        txt_mark_status:'Mark as Completed',
 
     }
 });

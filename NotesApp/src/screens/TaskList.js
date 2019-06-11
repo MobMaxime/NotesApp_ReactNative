@@ -7,9 +7,10 @@ import SQLite from "react-native-sqlite-storage";
 import localizedString from '../configs/AllStrings';
 import appcolors from '../configs/colors'
 import colors from '../configs/Utils'
-import {Menu,MenuOptions,MenuOption,MenuTrigger,} from 'react-native-popup-menu';
+import {Menu,MenuOptions,MenuOption,MenuTrigger} from 'react-native-popup-menu';
 import {connect} from 'react-redux';
 import globals from '../configs/globals';
+import database from '../configs/database'
 import { Actions} from 'react-native-router-flux';
 
 
@@ -46,21 +47,20 @@ export default class TaskList extends Component{
         },
         headerTintColor:appcolors.ThemeWhiteColor,
         headerLeft:null,
-        // headerRight: (
-        //         <Menu>
-        //         <MenuTrigger><Image style={{width:15,height:15,margin:10}} source={MENU_ICON}/></MenuTrigger>
-        //             <MenuOptions style={{backgroundColor:colors.ThemeColor}}>
-        //                 <MenuOption 
-        //                     onSelect={()=>params.changeTheme()}
-        //                     customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
-        //                     text='Theme1' />
-        //                 <MenuOption 
-        //                     onSelect={()=>colors.ThemeColor=appcolors.ThemeDarkBlueColor}
-        //                     customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
-        //                     text='Theme2' />
-        //             </MenuOptions>
-        //         </Menu>
-        //         ),
+        headerRight: (
+                <Menu>
+                <MenuTrigger><Image style={{width:15,height:15,margin:10}} source={MENU_ICON}/></MenuTrigger>
+                    <MenuOptions style={{backgroundColor:colors.ThemeColor}}>
+                        <MenuOption 
+                            customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
+                            text='Theme1' />
+                        <MenuOption 
+                            onSelect={()=>colors.ThemeColor=appcolors.ThemeDarkBlueColor}
+                            customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
+                            text='Theme2' />
+                    </MenuOptions>
+                </Menu>
+                ),
         }
     }
     componentWillMount()
@@ -69,11 +69,17 @@ export default class TaskList extends Component{
     }
     static onEnter()
     {
+        setTimeout(function(){
+            Actions.refresh({entered:new Date()});
+        },200)
         
     }
-    componentWillReceiveProps()
+    componentWillReceiveProps(newProps)
     {
-        
+        if(this.props.entered!=newProps.entered)
+        {
+            this.getTaskList();
+        }
     }
     componentDidMount(){
         // this.props.navigation.setParams({
@@ -81,7 +87,6 @@ export default class TaskList extends Component{
         //     changeTheme:this.props.changeThemeColor,
         // })
         this.getTaskList();
-        Actions.refresh();
     }
     getTaskList() {
         const { db } = this.state;
@@ -138,6 +143,7 @@ export default class TaskList extends Component{
                                     <Text style={{margin:5,fontSize:12,color:'gray',fontFamily:globals.FONT_APP,}}>{item.TaskDate} {item.TaskTime}</Text>
                                 </View>   
                                 <TouchableOpacity 
+                                    onPress={() => {database.clickOnDelete(item.TaskId),Actions.refresh({entered:new Date()})}}
                                     activeOpacity={0.7}>
                                     <Image
                                         source={DELETE_ICON}
