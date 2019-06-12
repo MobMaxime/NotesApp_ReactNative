@@ -97,13 +97,13 @@ export default class TaskList extends Component{
         return(<ActionButton buttonColor={appcolors.ThemeColor} onPress={() => Actions.editTask({isEdit:false})} style={styles.bottomButton}/>);
     }
     renderTaskStatus(){
-        return (<Text style={styles.listItemText} >{localizedString.txt_task_complete}</Text>)
+        return (<Text style={styles.listItemText}>{localizedString.txt_task_complete}</Text>)
     }
 
     render()
     {
         const {taskList} = this.state;
-        const AppStatusBar = () => (<StatusBar translucent barStyle="light-content" />);
+        const AppStatusBar = () => (<StatusBar translucent={false} barStyle="light-content" />);
 
         if(taskList.length == 0)
             return(

@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
   },
   barTitleStyle:{
     color:appcolors.ThemeWhiteColor,
-
   }
   
 });
