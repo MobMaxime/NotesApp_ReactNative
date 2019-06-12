@@ -4,7 +4,7 @@ import {Actions, ActionConst, Scene, Stack, Modal, Lightbox, Tabs, Router} from 
 import taskView from './src/screens';
 import appcolors from './src/configs/colors'
 import {TASK_ICON,TASK_DONE} from './src/configs/images'
-
+import MenuOption from './src/component/OptionMenu';
 const taskIcon = ()=>{
   return <Image source={TASK_ICON} style={styles.TabIconStyle} resizeMode='contain' />
 }
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     elevation:null,
     borderBottomColor:'transparent',
     borderBottomWidth:1, 
-    height:40,   
+    height:40, 
   },
   TabStyle:{
     height:50,
@@ -32,20 +32,20 @@ const styles = StyleSheet.create({
   },
   barTitleStyle:{
     color:appcolors.ThemeWhiteColor,
+
   }
   
 });
 const Scenes = Actions.create(
-  <Modal key='root' hideNavBar={false} title='TO-DO' navigationBarStyle={styles.navigationStyle}>
+  <Modal key='root' hideNavBar={false} title='TO-DO' renderRightButton={MenuOption}  navigationBarStyle={styles.navigationStyle} >
          <Tabs key="taskTab" tabBarPosition="top" titleStyle={styles.barTitleStyle} showLabel={false} showIcon={true} indicatorStyle={{backgroundColor:'white'}} tabBarStyle={styles.TabStyle}>  
                 <Stack key='Tab1' icon={taskIcon}  hideNavBar={false} >
-                    <Scene key="taskIncomplete" component={taskView.TaskList} hideNavBar />
+                    <Scene key="taskIncomplete"  component={taskView.TaskList} hideNavBar />
                 </Stack>
                 <Stack key='Tab2' icon={taskDoneIcon} hideNavBar={false} >
                     <Scene key="taskComplete" component={taskView.TaskList} hideNavBar />
                 </Stack>              
               </Tabs>
-            <Scene key="addTask" component={taskView.AddTask} />
             <Scene key="editTask" component={taskView.EditTask} />   
   </Modal>
     

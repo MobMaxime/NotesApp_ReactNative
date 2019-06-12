@@ -5,21 +5,6 @@ import localizedString from '../configs/AllStrings'
 import { Actions } from 'react-native-router-flux';
 export default class  dbOperation extends Component
 {
-    static getAllTaskList() {
-        dbConnection().transaction(tx => {
-        tx.executeSql('SELECT * FROM TaskList', [], (tx, results) => {
-            const rows = results.rows;
-            let taskList = [];
-            for (let i = 0; i < rows.length; i++) {
-                taskList.push({
-                ...rows.item(i),
-            });
-            }
-            return taskList;
-        });
-        });
-    }
-
     static getTaskList = function(isCompleted) {
         return new Promise(function (resolve, reject){
             dbConnection().transaction(tx => {
