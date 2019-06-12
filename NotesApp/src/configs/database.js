@@ -5,9 +5,9 @@ import localizedString from '../configs/AllStrings'
 import { Actions } from 'react-native-router-flux';
 export default class  dbOperation extends Component
 {
-    static getTaskList() {
+    static getAllTaskList() {
         dbConnection().transaction(tx => {
-        tx.executeSql('SELECT * FROM TaskList;', [], (tx, results) => {
+        tx.executeSql('SELECT * FROM TaskList', [], (tx, results) => {
             const rows = results.rows;
             let taskList = [];
             for (let i = 0; i < rows.length; i++) {
@@ -19,10 +19,33 @@ export default class  dbOperation extends Component
         });
         });
     }
-    static insertTaskData(Description,taskDate,taskTime,status)
+
+    static getTaskList = function(isCompleted) {
+        return new Promise(function (resolve, reject){
+            dbConnection().transaction(tx => {
+                tx.executeSql('SELECT * FROM TaskList where Status=?', [isCompleted], (tx, results) => {
+                    const rows = results.rows;
+                    if(rows.length > 0){
+                        let taskList = [];
+                        for (let i = 0; i < rows.length; i++) {
+                            taskList.push({
+                            ...rows.item(i),
+                        });
+                        }
+                        return resolve(taskList);
+                    }else
+                        return resolve([]);
+                });
+            });
+        }).catch((error)=>{
+            console.log(JSON.stringify(error));
+        });
+    }
+
+    static insertTaskData(Description,taskDate,status)
     {
         dbConnection().transaction(tx => {
-        tx.executeSql('INSERT INTO TASKLIST(Description,TaskDate,TaskTime,Status) values(?,?,?,?)', [Description,taskDate,taskTime,status], 
+        tx.executeSql('INSERT INTO TASKLIST(Description,TaskDate,Status) values(?,?,?)', [Description,taskDate,status], 
         (tx, results) => {
             if(results.rowsAffected > 0)
             {
@@ -68,9 +91,9 @@ export default class  dbOperation extends Component
         console.log(JSON.stringify(error));
     });
     }
-    static updateTaskData(TaskId,Description,taskDate,taskTime,status){
+    static updateTaskData(TaskId,Description,taskDate,status){
         dbConnection().transaction(tx => {
-        tx.executeSql('UPDATE TaskList set Description=?,TaskDate=?,TaskTime=?,Status=? where TaskId=?', [Description,taskDate,taskTime,status,TaskId], 
+        tx.executeSql('UPDATE TaskList set Description=?,TaskDate=?,Status=? where TaskId=?', [Description,taskDate,status,TaskId], 
         (tx, results) => {
             if(results.rowsAffected > 0)
             {

@@ -1,11 +1,11 @@
 import React ,{Component} from 'react';
-import {Text,TextInput,View,Image,StyleSheet,FlatList,TouchableOpacity,StatusBar} from 'react-native';
+import {Text,View,Image,StyleSheet,FlatList,TouchableOpacity,StatusBar} from 'react-native';
 import {EDIT_ICON,MENU_ICON,DELETE_ICON} from '../../src/configs/images';
 import ActionButton from 'react-native-action-button';
-import SQLite from "react-native-sqlite-storage";
 import localizedString from '../configs/AllStrings';
 import appcolors from '../configs/colors'
 import {Menu,MenuOptions,MenuOption,MenuTrigger} from 'react-native-popup-menu';
+import Moment from 'moment';
 import globals from '../configs/globals';
 import database from '../configs/database'
 import { Actions} from 'react-native-router-flux';
@@ -14,22 +14,9 @@ export default class TaskList extends Component{
     constructor(props)
     {
         super(props);              
-        const db = SQLite.openDatabase(
-            {
-                name:'TaskDatabase.db',
-                location:'default',
-                createFromLocation:'~www/TaskDatabase.db',
-            },
-            ()=>{},
-            error=>{
-                console.log(error);
-            }            
-        );
         this.state = {
-            db,
             taskList:[],
             taskDetail:null,
-            taskCount:0,
             selectedTaskId:null,
         }
     }    
@@ -61,8 +48,8 @@ export default class TaskList extends Component{
     }
     componentWillMount()
     {
-        
     }
+
     static onEnter()
     {
         setTimeout(function(){
@@ -80,21 +67,8 @@ export default class TaskList extends Component{
         this.getRefersh();
     }
     getTaskList(status) {
-        const { db } = this.state;
-        db.transaction(tx => {
-        tx.executeSql('SELECT * FROM TaskList where Status=?;', [status], (tx, results) => {
-            const rows = results.rows;
-            let taskList = [];
-            this.setState({
-                taskCount:rows.length
-            })
-            for (let i = 0; i < rows.length; i++) {
-                taskList.push({
-                ...rows.item(i),
-            });
-            }
-            this.setState({ taskList  });
-        });
+        database.getTaskList(status).then((taskList)=>{
+            this.setState({taskList: taskList})     
         });
     }
    getRefersh()
@@ -115,6 +89,9 @@ export default class TaskList extends Component{
         Actions.editTask({task:taskItem, isEdit:true});
 
     }
+    formateDateAndTime = (date)=>{
+        return `${Moment(date).format('DD MMM, YYYY')} ${Moment(date).format("hh:mm A")}`
+    }
 
     renderActionButton(){
         return(<ActionButton buttonColor={appcolors.ThemeColor} onPress={() => Actions.editTask({isEdit:false})} style={styles.bottomButton}/>);
@@ -128,7 +105,7 @@ export default class TaskList extends Component{
         const {taskList} = this.state;
         const AppStatusBar = () => (<StatusBar translucent barStyle="light-content" />);
 
-        if(taskList.length<1)
+        if(taskList.length == 0)
             return(
                 <View style={styles.containerMain}>
                      <AppStatusBar />
@@ -147,7 +124,7 @@ export default class TaskList extends Component{
                             <View style={styles.TaskView}>
                                 <View style={styles.listTextContainer}>
                                     <Text style={styles.listItemText}>{item.Description}</Text>
-                                    <Text style={styles.listItemText}>{item.TaskDate} {item.TaskTime}</Text>
+                                    <Text style={styles.listItemText}>{this.formateDateAndTime(item.TaskDate)}</Text>
                                     {(item.Status) ? this.renderTaskStatus():null}
                                 </View>   
                                 <TouchableOpacity 
@@ -177,17 +154,7 @@ export default class TaskList extends Component{
         }        
     }
 }
-// function mapStateToProps(state){
-//     return{
-//         theme:state.theme
-//     }
-// }
-// function mapDispatchToProps(dispatch){
-//     return{
-//         changeThemeColor:()=>dispatch({type:'THEME1'}),
-//     }
-// }
-//export default connect(mapStateToProps,mapDispatchToProps)(TaskList)
+
 const styles = StyleSheet.create({
     containerMain:{
         flex:1,

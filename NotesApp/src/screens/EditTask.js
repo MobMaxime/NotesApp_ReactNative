@@ -50,7 +50,7 @@ export default class EditTask extends Component{
         let isTaskAvailable = this.props.task != null
         let taskId = (isTaskAvailable)&&(this.props.task.TaskId);
         let taskDate = (isTaskAvailable)?(this.props.task.TaskDate):Moment(new Date()).format('DD MMM, YYYY');
-        let taskTime = (isTaskAvailable)?(this.props.task.TaskTime):Moment(new Date()).format("h:mm A");
+        let taskTime = (isTaskAvailable)?(this.props.task.TaskDate):Moment(new Date()).format("h:mm A");
         let taskDescription = (isTaskAvailable)&&(this.props.task.Description);
 
         this.setState({
@@ -78,17 +78,7 @@ export default class EditTask extends Component{
         });
     }    
     handleDatePicked = dateTime =>{       
-        if(this.state.pickeMode=='date')
-        {
-            this.setState({            
-                taskDate:Moment(dateTime).format('DD MMM, YYYY'),
-            });
-        }else
-        {
-            this.setState({            
-                taskTime:Moment(dateTime).format("h:mm A"),
-            });
-        }  
+        this.setState({ taskDate:dateTime });
         this.hideDateTimePicker();
     }   
     showTimePicker=()=>{
@@ -108,13 +98,12 @@ export default class EditTask extends Component{
             const { TaskId } = this.state;
             const { Description } = this.state;
             const { taskDate } = this.state;
-            const { taskTime } = this.state;
             const { checked } = this.state;
 
             if(this.props.isEdit)
-                database.updateTaskData(TaskId,Description,taskDate,taskTime,checked);
+                database.updateTaskData(TaskId,Description,taskDate,checked);
             else
-                database.insertTaskData(Description,taskDate,taskTime,checked);    
+                database.insertTaskData(Description,taskDate,checked);    
             Actions.pop();
         }
     }
@@ -140,23 +129,24 @@ export default class EditTask extends Component{
                     <TextInput style={styles.textView} defaultValue={this.state.Description} onChangeText={(value) => this.setState({ Description: value })} placeholder={localizedString.txt_enter_task} placeholderTextColor={appcolors.ThemeLightGrayColor} />
                     <View style={{marginTop:10}}>
                         <TouchableOpacity style={styles.taskButton} onPress={this.showDateTimePicker} activeOpacity={0.7}>
-                            <Text style={styles.taskText}>{this.state.taskDate}</Text>
+                            <Text style={styles.taskText}>{Moment(this.state.taskDate).format('DD MMM, YYYY')}</Text>
                                 <Image
                                     source={DATE_ICON}
                                     style={styles.taskIcon}/>
                             </TouchableOpacity>                            
                         <TouchableOpacity style={styles.taskButton} onPress={this.showTimePicker} activeOpacity={0.7}>
-                            <Text style={styles.taskText}>{this.state.taskTime}</Text>
+                            <Text style={styles.taskText}>{Moment(this.state.taskDate).format("hh:mm A")}</Text>
                                 <Image
                                     source={TIME_ICON}
                                     style={styles.taskIcon}/>
                         </TouchableOpacity>  
-                        <DateTimePicker 
+                        <DateTimePicker
+                            date={new Date(this.state.taskDate)}
                             isVisible={this.state.isDateTimePickerVisible}
                             onCancel={this.hideDateTimePicker}
                             onConfirm={this.handleDatePicked}
                             mode={this.state.pickeMode}
-                            titleIOS={this.state.pickerTitle}        
+                            titleIOS={this.state.pickerTitle}
                         />                      
                     </View>   
                 </View>
