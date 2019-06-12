@@ -67,30 +67,17 @@ export default class TaskList extends Component{
     {
         setTimeout(function(){
             Actions.refresh({entered:new Date()});
-        },200)
+        },50)
         
     }
     componentWillReceiveProps(nextProps)
     {
         if (!this.props.entered && nextProps.entered || this.props.entered && this.props.entered !== nextProps.entered) {
-            if(Actions.currentScene == 'taskIncomplete')
-            {
-                setTimeout(()=>{
-                    this.getTaskList(false)
-                },200)
-                
-            }
-            else if(Actions.currentScene == 'taskComplete')
-            {
-                this.getTaskList(true)
-            }
+            this.getRefersh();
         }
     }
     componentDidMount(){
-        // this.props.navigation.setParams({
-        //     theme:this.props.theme,
-        //     changeTheme:this.props.changeThemeColor,
-        // })
+        this.getRefersh();
     }
     getTaskList(status) {
         const { db } = this.state;
@@ -110,7 +97,13 @@ export default class TaskList extends Component{
         });
         });
     }
-   
+   getRefersh()
+   {
+        if(Actions.currentScene == 'taskIncomplete')
+            this.getTaskList(false)
+        else if(Actions.currentScene == 'taskComplete')
+            this.getTaskList(true)
+   }
     componentWillUnmount()
     {
 
@@ -158,10 +151,7 @@ export default class TaskList extends Component{
                                     {(item.Status) ? this.renderTaskStatus():null}
                                 </View>   
                                 <TouchableOpacity 
-                                    onPress={() => {database.clickOnDelete(item.TaskId).then(function(deleted){
-                                        if(deleted)
-                                            Actions.refresh({entered:new Date()})
-                                    });}}
+                                    onPress={() => {database.clickOnDelete(item.TaskId); Actions.refresh({entered:new Date()})}}
                                     activeOpacity={0.7}>
                                     <Image
                                         source={DELETE_ICON}
