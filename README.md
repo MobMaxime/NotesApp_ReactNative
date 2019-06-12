@@ -4,6 +4,14 @@ Notes Application In ReactNative(Android + iOS)
 <img src="https://github.com/MobMaxime/NotesApp_ReactNative/blob/master/Gif/todo_Android.gif" width="320" alt="NotesApp" />
 <br/><br/>
 
+
+---
+## Application Features
+* Create New Notes from the Action button
+* Locally store created Note using database file.
+* Fetch and Display Complete and InComplete notes from the locale db file
+* Update and delete feature from the local db file
+  
 ---
 ## Note about the source code
 
