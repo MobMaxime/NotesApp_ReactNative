@@ -7,9 +7,9 @@ Notes Application In ReactNative(Android + iOS)
 ---
 ## Note about the source code
 
-Please note that my objective was not a release the game. Therefore, there are still things which are not fully implemented or tested.
+Please note that my objective was not a release the To-Do App. Therefore, there are still things which are not fully implemented or tested.
 
-Also, if the source code might give you ideas to build your own game, I will be more than happy… simply let us know…
+Also, if the source code might give you ideas to build your own app, I will be more than happy… simply let us know…
 
 ---
 
