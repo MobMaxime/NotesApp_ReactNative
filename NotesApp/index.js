@@ -12,6 +12,7 @@ import {Router} from 'react-native-router-flux';
 import { connect,Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import {MenuProvider} from 'react-native-popup-menu';
+var SQLite = require('react-native-sqlite-storage')
 
 const loggerMiddleware = createLogger()
 const ConnectedRouter = connect()(Router);
