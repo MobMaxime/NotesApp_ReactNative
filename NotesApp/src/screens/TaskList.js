@@ -103,7 +103,7 @@ export default class TaskList extends Component{
     render()
     {
         const {taskList} = this.state;
-        const AppStatusBar = () => (<StatusBar translucent={false} barStyle="light-content" />);
+        const AppStatusBar = () => (<StatusBar backgroundColor={appcolors.ThemeColor} translucent={false} barStyle="light-content" />);
 
         if(taskList.length == 0)
             return(
