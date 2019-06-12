@@ -158,7 +158,10 @@ export default class TaskList extends Component{
                                     {(item.Status) ? this.renderTaskStatus():null}
                                 </View>   
                                 <TouchableOpacity 
-                                    onPress={() => {database.clickOnDelete(item.TaskId); Actions.refresh({entered:new Date()})}}
+                                    onPress={() => {database.clickOnDelete(item.TaskId).then(function(deleted){
+                                        if(deleted)
+                                            Actions.refresh({entered:new Date()})
+                                    });}}
                                     activeOpacity={0.7}>
                                     <Image
                                         source={DELETE_ICON}

@@ -119,7 +119,7 @@ export default class EditTask extends Component{
         }
     }
     clickOnDelete=(id)=>{
-        database.clickOnDelete(id);    
+        database.clickOnDelete(id).then(function(deleted){ if(deleted)Actions.pop(); });    
    }
 
     renderCheckBox(){

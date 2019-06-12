@@ -39,7 +39,8 @@ export default class  dbOperation extends Component
         });
         });
     }
-    static clickOnDelete(id){
+    static clickOnDelete = function(id){
+        return new Promise(function (resolve, reject){
         Alert.alert(
             localizedString.txt_alert,localizedString.txt_delete_task_alert,
             [
@@ -50,12 +51,12 @@ export default class  dbOperation extends Component
                         if(results.rowsAffected > 0)
                         {
                             Alert.alert(localizedString.txt_success,localizedString.txt_delete_task,[
-                                {text:localizedString.txt_ok, onPress: () => Actions.pop(),},
+                                {text:localizedString.txt_ok, onPress: () => {return resolve(true)}},
                             ]); 
                         }
                         else
                         {
-                            Alert.alert('',localizedString.txt_failled,[{text:localizedString.txt_ok},])
+                            Alert.alert('',localizedString.txt_failled,[{text:localizedString.txt_ok, onPress:() => {return resolve(false)}}]);
                         }
                     });
                     });
@@ -63,6 +64,9 @@ export default class  dbOperation extends Component
                 {text:localizedString.txt_no}, 
             ]
         );
+    }).catch((error)=>{
+        console.log(JSON.stringify(error));
+    });
     }
     static updateTaskData(TaskId,Description,taskDate,taskTime,status){
         dbConnection().transaction(tx => {
