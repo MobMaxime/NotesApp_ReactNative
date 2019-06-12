@@ -19,10 +19,10 @@ export default class  dbOperation extends Component
         });
         });
     }
-    static insertTaskData(Description,taskDate,taskTime)
+    static insertTaskData(Description,taskDate,taskTime,status)
     {
         dbConnection().transaction(tx => {
-        tx.executeSql('INSERT INTO TASKLIST(Description,TaskDate,TaskTime) values(?,?,?)', [Description,taskDate,taskTime], 
+        tx.executeSql('INSERT INTO TASKLIST(Description,TaskDate,TaskTime,Status) values(?,?,?,?)', [Description,taskDate,taskTime,status], 
         (tx, results) => {
             if(results.rowsAffected > 0)
             {
@@ -50,7 +50,7 @@ export default class  dbOperation extends Component
                         if(results.rowsAffected > 0)
                         {
                             Alert.alert(localizedString.txt_success,localizedString.txt_delete_task,[
-                                {text:localizedString.txt_ok, onPress: () => Actions.pop()},
+                                {text:localizedString.txt_ok, onPress: () => Actions.pop(),},
                             ]); 
                         }
                         else
@@ -64,9 +64,9 @@ export default class  dbOperation extends Component
             ]
         );
     }
-    static updateTaskData(TaskId,Description,taskDate,taskTime){
+    static updateTaskData(TaskId,Description,taskDate,taskTime,status){
         dbConnection().transaction(tx => {
-        tx.executeSql('UPDATE TaskList set Description=?,TaskDate=?,TaskTime=? where TaskId=?', [Description,taskDate,taskTime,TaskId], 
+        tx.executeSql('UPDATE TaskList set Description=?,TaskDate=?,TaskTime=?,Status=? where TaskId=?', [Description,taskDate,taskTime,status,TaskId], 
         (tx, results) => {
             if(results.rowsAffected > 0)
             {

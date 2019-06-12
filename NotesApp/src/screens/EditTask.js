@@ -104,14 +104,17 @@ export default class EditTask extends Component{
             Alert.alert(localizedString.required_task);
         else
         {
+            var status;
             const { TaskId } = this.state;
             const { Description } = this.state;
             const { taskDate } = this.state;
             const { taskTime } = this.state;
+            const { checked } = this.state;
+
             if(this.props.isEdit)
-                database.updateTaskData(TaskId,Description,taskDate,taskTime);
+                database.updateTaskData(TaskId,Description,taskDate,taskTime,checked);
             else
-                database.insertTaskData(Description,taskDate,taskTime);    
+                database.insertTaskData(Description,taskDate,taskTime,checked);    
             Actions.pop();
         }
     }

@@ -40,10 +40,10 @@ const Scenes = Actions.create(
   <Modal key='root' hideNavBar={false} title='TO-DO' navigationBarStyle={styles.navigationStyle}>
          <Tabs key="taskTab" tabBarPosition="top" titleStyle={styles.barTitleStyle} showLabel={false} showIcon={true} indicatorStyle={{backgroundColor:'white'}} tabBarStyle={styles.TabStyle}>  
                 <Stack key='Tab1' icon={taskIcon}  hideNavBar={false} >
-                    <Scene key="taskList" component={taskView.TaskList} hideNavBar />
+                    <Scene key="taskIncomplete" component={taskView.TaskList} hideNavBar />
                 </Stack>
                 <Stack key='Tab2' icon={taskDoneIcon} hideNavBar={false} >
-                    <Scene key="taskList" component={taskView.TaskList} hideNavBar />
+                    <Scene key="taskComplete" component={taskView.TaskList} hideNavBar />
                 </Stack>              
               </Tabs>
             <Scene key="addTask" component={taskView.AddTask} />

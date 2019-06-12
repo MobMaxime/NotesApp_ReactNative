@@ -1,5 +1,5 @@
 import React ,{Component} from 'react';
-import {Text,View,Image,StyleSheet,FlatList,TouchableOpacity,StatusBar} from 'react-native';
+import {Text,TextInput,View,Image,StyleSheet,FlatList,TouchableOpacity,StatusBar} from 'react-native';
 import {EDIT_ICON,MENU_ICON,DELETE_ICON} from '../../src/configs/images';
 import ActionButton from 'react-native-action-button';
 import SQLite from "react-native-sqlite-storage";
@@ -70,11 +70,20 @@ export default class TaskList extends Component{
         },200)
         
     }
-    componentWillReceiveProps(newProps)
+    componentWillReceiveProps(nextProps)
     {
-        if(this.props.entered!=newProps.entered)
-        {
-            this.getTaskList();
+        if (!this.props.entered && nextProps.entered || this.props.entered && this.props.entered !== nextProps.entered) {
+            if(Actions.currentScene == 'taskIncomplete')
+            {
+                setTimeout(()=>{
+                    this.getTaskList(false)
+                },200)
+                
+            }
+            else if(Actions.currentScene == 'taskComplete')
+            {
+                this.getTaskList(true)
+            }
         }
     }
     componentDidMount(){
@@ -82,12 +91,11 @@ export default class TaskList extends Component{
         //     theme:this.props.theme,
         //     changeTheme:this.props.changeThemeColor,
         // })
-        this.getTaskList();
     }
-    getTaskList() {
+    getTaskList(status) {
         const { db } = this.state;
         db.transaction(tx => {
-        tx.executeSql('SELECT * FROM TaskList;', [], (tx, results) => {
+        tx.executeSql('SELECT * FROM TaskList where Status=?;', [status], (tx, results) => {
             const rows = results.rows;
             let taskList = [];
             this.setState({
@@ -112,10 +120,14 @@ export default class TaskList extends Component{
     }
     clickOnEdit=(taskItem)=>{
         Actions.editTask({task:taskItem, isEdit:true});
+
     }
 
     renderActionButton(){
         return(<ActionButton buttonColor={appcolors.ThemeColor} onPress={() => Actions.editTask({isEdit:false})} style={styles.bottomButton}/>);
+    }
+    renderTaskStatus(){
+        return (<Text style={styles.listItemText} >{localizedString.txt_task_complete}</Text>)
     }
 
     render()
@@ -137,11 +149,13 @@ export default class TaskList extends Component{
                 <View style={styles.containerMain}>
                     <AppStatusBar />
                     <FlatList data={taskList}
+                        keyExtractor={item=> item.TaskId}
                         renderItem={({item})=>(
                             <View style={styles.TaskView}>
                                 <View style={styles.listTextContainer}>
                                     <Text style={styles.listItemText}>{item.Description}</Text>
                                     <Text style={styles.listItemText}>{item.TaskDate} {item.TaskTime}</Text>
+                                    {(item.Status) ? this.renderTaskStatus():null}
                                 </View>   
                                 <TouchableOpacity 
                                     onPress={() => {database.clickOnDelete(item.TaskId); Actions.refresh({entered:new Date()})}}

@@ -23,6 +23,7 @@ const strings = new LocalizedStrings({
         txt_pick_time:"Pick a Time",
         txt_light_theme:"Light Theme",
         txt_dark_theme:"Dark Theme",
+        txt_task_complete:'Task Completed',
     }
 });
 
