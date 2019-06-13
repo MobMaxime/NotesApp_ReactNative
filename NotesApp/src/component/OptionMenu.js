@@ -5,6 +5,7 @@ import appcolors from '../configs/colors';
 import globals from '../configs/globals';
 import { Actions} from 'react-native-router-flux';
 import localizedString from '../configs/AllStrings';
+import taskList from '../screens/TaskList';
 
 import {Menu,MenuOptions,MenuOption,MenuTrigger} from 'react-native-popup-menu';
 
@@ -17,7 +18,7 @@ const OptionMenu = ()=>{
                     customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
                     text={localizedString.txt_light_theme} />
                 <MenuOption 
-                    onSelect={()=>{Actions.refresh();}}
+                    
                     customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
                     text={localizedString.txt_dark_theme} />
             </MenuOptions>

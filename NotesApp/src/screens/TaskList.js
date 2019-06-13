@@ -9,15 +9,23 @@ import Moment from 'moment';
 import globals from '../configs/globals';
 import database from '../configs/database'
 import { Actions} from 'react-native-router-flux';
+import theme from 'react-native-theme';
+
+theme.add({
+    title:{
+        color:'blue'
+    },
+},'red');
 
 export default class TaskList extends Component{
+
     constructor(props)
     {
         super(props);              
         this.state = {
             taskList:[],
             taskDetail:null,
-            selectedTaskId:null,
+            selectedTaskId:null,            
         }
     }    
     static navigationOptions =({navigation})=>{
@@ -30,20 +38,6 @@ export default class TaskList extends Component{
         },
         headerTintColor:appcolors.ThemeWhiteColor,
         headerLeft:null,
-        headerRight: (
-                <Menu>
-                <MenuTrigger><Image style={{width:15,height:15,margin:10}} source={MENU_ICON}/></MenuTrigger>
-                    <MenuOptions style={{backgroundColor:appcolors.ThemeColor}}>
-                        <MenuOption 
-                            customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
-                            text={localizedString.txt_light_theme} />
-                        <MenuOption 
-                            onSelect={()=>{Actions.refresh();}}
-                            customStyles={{optionText: { color:appcolors.ThemeWhiteColor},fontFamily:globals.FONT_APP}} 
-                            text={localizedString.txt_dark_theme} />
-                    </MenuOptions>
-                </Menu>
-                ),
         }
     }
     componentWillMount()
@@ -137,13 +131,17 @@ export default class TaskList extends Component{
                                         source={DELETE_ICON}
                                         style={styles.rightIcon}/>
                                 </TouchableOpacity>
-                                <TouchableOpacity 
-                                    onPress={()=>this.clickOnEdit(item)}
-                                    activeOpacity={0.7}>
-                                    <Image
-                                        source={EDIT_ICON}
-                                        style={styles.rightIcon}/>
-                                </TouchableOpacity>
+                                {
+                                    (!item.Status)?
+                                    <TouchableOpacity 
+                                        onPress={()=>this.clickOnEdit(item)}
+                                        activeOpacity={0.7}>
+                                        <Image
+                                            source={EDIT_ICON}
+                                            style={styles.rightIcon}/>
+                                    </TouchableOpacity>:null
+                                }
+                                
                             </View>
                         )}>
                         </FlatList>  

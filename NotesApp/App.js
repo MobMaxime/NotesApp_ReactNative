@@ -46,7 +46,7 @@ const Scenes = Actions.create(
                     <Scene key="taskComplete" component={taskView.TaskList} hideNavBar />
                 </Stack>              
               </Tabs>
-            <Scene key="editTask" component={taskView.EditTask} />   
+            <Scene key="editTask"  component={taskView.EditTask} />   
   </Modal>
     
 );

@@ -3,6 +3,7 @@ package com.notesapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import in.sriraman.sharedpreferences.RNSharedPreferencesReactPackage;
 import com.babisoft.ReactNativeLocalization.ReactNativeLocalizationPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -27,6 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSharedPreferencesReactPackage(),
           new ReactNativeLocalizationPackage(),
           new VectorIconsPackage(),
           new RNGestureHandlerPackage(),
