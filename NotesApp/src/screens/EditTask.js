@@ -104,7 +104,7 @@ export default class EditTask extends Component{
                 database.updateTaskData(TaskId,Description,taskDate,checked);
             else
                 database.insertTaskData(Description,taskDate,checked);    
-            Actions.pop();
+           Actions.pop()
         }
     }
     clickOnDelete=(id)=>{
@@ -114,31 +114,31 @@ export default class EditTask extends Component{
     renderCheckBox(){
         return(
         <CheckBox containerStyle={styles.checkBox} iconRight size={28} 
-        checkedColor={appcolors.ThemeWhiteColor} 
-        textStyle={styles.checkBoxTitle} title={localizedString.txt_mark_status} 
+        checkedColor={appcolors.ThemeDarkColor} 
+        textStyle={[styles.checkBoxTitle,{color: appcolors.ThemeDarkColor}]} title={localizedString.txt_mark_status} 
         checked={this.state.checked} onPress={()=>this.setState({checked:!this.state.checked})}/>);
     }
 
     render()
     {
         return(
-            <View style={styles.container}>
+            <View style={[styles.container,{backgroundColor: appcolors.ThemeBackgroundColor}]}>
                 {this.props.isEdit && this.renderCheckBox()}
                 <View style={styles.taskView}>
-                    <Text style={styles.taskTitle}>Task</Text>
-                    <TextInput style={styles.textView} defaultValue={this.state.Description} onChangeText={(value) => this.setState({ Description: value })} placeholder={localizedString.txt_enter_task} placeholderTextColor={appcolors.ThemeLightGrayColor} />
+                    <Text style={[styles.taskTitle,{color:appcolors.ThemeDarkColor}]}>{localizedString.txt_task}</Text>
+                    <TextInput style={[styles.textView,{color:appcolors.ThemeDarkColor}]} defaultValue={this.state.Description} onChangeText={(value) => this.setState({ Description: value })} placeholder={localizedString.txt_enter_task} placeholderTextColor={appcolors.ThemeLightGrayColor} />
                     <View style={{marginTop:10}}>
                         <TouchableOpacity style={styles.taskButton} onPress={this.showDateTimePicker} activeOpacity={0.7}>
-                            <Text style={styles.taskText}>{Moment(this.state.taskDate).format('DD MMM, YYYY')}</Text>
+                            <Text style={[styles.taskText,{color:appcolors.ThemeDarkColor}]}>{Moment(this.state.taskDate).format('DD MMM, YYYY')}</Text>
                                 <Image
                                     source={DATE_ICON}
-                                    style={styles.taskIcon}/>
+                                    style={[styles.taskIcon,{tintColor:appcolors.ThemeDarkColor}]}/>
                             </TouchableOpacity>                            
                         <TouchableOpacity style={styles.taskButton} onPress={this.showTimePicker} activeOpacity={0.7}>
-                            <Text style={styles.taskText}>{Moment(this.state.taskDate).format("hh:mm A")}</Text>
+                            <Text style={[styles.taskText,{color:appcolors.ThemeDarkColor}]}>{Moment(this.state.taskDate).format("hh:mm A")}</Text>
                                 <Image
                                     source={TIME_ICON}
-                                    style={styles.taskIcon}/>
+                                    style={[styles.taskIcon,{tintColor:appcolors.ThemeDarkColor}]}/>
                         </TouchableOpacity>  
                         <DateTimePicker
                             date={new Date(this.state.taskDate)}
@@ -151,11 +151,11 @@ export default class EditTask extends Component{
                     </View>   
                 </View>
             
-                <TouchableOpacity style={styles.button} onPress={this.clickOnSave}> 
+                <TouchableOpacity style={[styles.button,{backgroundColor: appcolors.ThemeColor}]} onPress={this.clickOnSave}> 
                    <Text style={styles.buttonText}>Save</Text>
                 </TouchableOpacity > 
                 {this.props.isEdit &&
-                <TouchableOpacity style={styles.button} onPress={()=>this.clickOnDelete(this.state.TaskId)}>
+                <TouchableOpacity style={[styles.button,{backgroundColor: appcolors.ThemeColor}]} onPress={()=>this.clickOnDelete(this.state.TaskId)}>
                     <Text style={styles.buttonText}>Delete</Text>
                 </TouchableOpacity>}
         </View>

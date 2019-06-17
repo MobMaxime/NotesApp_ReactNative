@@ -1,23 +1,19 @@
 import React ,{Component} from 'react';
-import {Text,View,Image,StyleSheet,FlatList,TouchableOpacity,StatusBar} from 'react-native';
-import {EDIT_ICON,MENU_ICON,DELETE_ICON} from '../../src/configs/images';
-import ActionButton from 'react-native-action-button';
+import {Text,View,Image,StyleSheet,FlatList,TouchableOpacity, StatusBar} from 'react-native';
+import {EDIT_ICON,DELETE_ICON} from '../../src/configs/images';
 import localizedString from '../configs/AllStrings';
 import appcolors from '../configs/colors'
-import {Menu,MenuOptions,MenuOption,MenuTrigger} from 'react-native-popup-menu';
 import Moment from 'moment';
 import globals from '../configs/globals';
 import database from '../configs/database'
-import { Actions} from 'react-native-router-flux';
-import theme from 'react-native-theme';
+import { Actions } from 'react-native-router-flux';
+import { connect } from 'react-redux';
+import ActionButton from 'react-native-action-button';
 
-theme.add({
-    title:{
-        color:'blue'
-    },
-},'red');
-
-export default class TaskList extends Component{
+function mapStateToProps (state) {
+    return state
+  }
+class TaskList extends Component{
 
     constructor(props)
     {
@@ -27,29 +23,20 @@ export default class TaskList extends Component{
             taskDetail:null,
             selectedTaskId:null,            
         }
-    }    
-    static navigationOptions =({navigation})=>{
-        const { params ={}} = navigation.state;
-
-        return{
-            title:localizedString.main_task_header,
-        headerStyle:{
-            backgroundColor:appcolors.ThemeColor
-        },
-        headerTintColor:appcolors.ThemeWhiteColor,
-        headerLeft:null,
-        }
     }
+    
     componentWillMount()
     {
     }
 
+    renderActionButton(){
+        return(<ActionButton buttonColor={appcolors.ThemeColor} onPress={() => Actions.editTask({isEdit:false})} style={styles.bottomButton}/>);
+    }
+
     static onEnter()
     {
-        setTimeout(function(){
-            Actions.refresh({entered:new Date()});
-        },50)
-        
+        globals.setSelectedTheme();
+        Actions.refresh({entered:new Date()});
     }
     componentWillReceiveProps(nextProps)
     {
@@ -87,71 +74,69 @@ export default class TaskList extends Component{
         return `${Moment(date).format('DD MMM, YYYY')} ${Moment(date).format("hh:mm A")}`
     }
 
-    renderActionButton(){
-        return(<ActionButton buttonColor={appcolors.ThemeColor} onPress={() => Actions.editTask({isEdit:false})} style={styles.bottomButton}/>);
-    }
-    renderTaskStatus(){
-        return (<Text style={styles.listItemText}>{localizedString.txt_task_complete}</Text>)
+    renderFlatListItem(taskItem){
+        return(
+            <View style={[styles.TaskView,{backgroundColor:appcolors.ThemeColor}]}>
+                    <View style={styles.listTextContainer}>
+                        <Text style={styles.listItemText}>{taskItem.Description}</Text>
+                        <Text style={styles.listItemText}>{this.formateDateAndTime(taskItem.TaskDate)}</Text>
+                        {(taskItem.Status) ? <Text style={styles.listItemText}>{localizedString.txt_task_complete}</Text> :null}
+                    </View>   
+                    <TouchableOpacity 
+                        onPress={() => {database.clickOnDelete(taskItem.TaskId).then(function(deleted){
+                                        if(deleted)
+                                            Actions.reset(Actions.currentScene);
+                        });}}
+                        activeOpacity={0.7}>
+                        <Image
+                            source={DELETE_ICON}
+                            style={styles.rightIcon}/>
+                    </TouchableOpacity>
+                    {
+                        (!taskItem.Status)?
+                        <TouchableOpacity 
+                            onPress={()=>this.clickOnEdit(taskItem)}
+                            activeOpacity={0.7}>
+                            <Image
+                                source={EDIT_ICON}
+                                style={styles.rightIcon}/>
+                        </TouchableOpacity>:null
+                    }
+                </View>
+        );
     }
 
     render()
     {
-        const {taskList} = this.state;
         const AppStatusBar = () => (<StatusBar backgroundColor={appcolors.ThemeColor} translucent={false} barStyle="light-content" />);
+        const {taskList} = this.state;
 
         if(taskList.length == 0)
             return(
-                <View style={styles.containerMain}>
-                     <AppStatusBar />
-                    <Text style={styles.textNoData}>No Task Available</Text>
+                <View style={[styles.containerMain,{backgroundColor:appcolors.ThemeBackgroundColor}]}>
+                    <Text style={[styles.textNoData,{color:appcolors.ThemeDarkColor}]}>{localizedString.txt_no_task}</Text>
+                    <AppStatusBar/>
                     {this.renderActionButton()}
                 </View>
             );
         else
         {
             return(
-                <View style={styles.containerMain}>
-                    <AppStatusBar />
+                <View style={[styles.containerMain,{backgroundColor:appcolors.ThemeBackgroundColor}]}>
                     <FlatList data={taskList}
+                        extraData={this.props}
                         keyExtractor={item=> item.TaskId}
-                        renderItem={({item})=>(
-                            <View style={styles.TaskView}>
-                                <View style={styles.listTextContainer}>
-                                    <Text style={styles.listItemText}>{item.Description}</Text>
-                                    <Text style={styles.listItemText}>{this.formateDateAndTime(item.TaskDate)}</Text>
-                                    {(item.Status) ? this.renderTaskStatus():null}
-                                </View>   
-                                <TouchableOpacity 
-                                    onPress={() => {database.clickOnDelete(item.TaskId).then(function(deleted){
-                                                    if(deleted)
-                                                        Actions.refresh({entered:new Date()})
-                                    });}}
-                                    activeOpacity={0.7}>
-                                    <Image
-                                        source={DELETE_ICON}
-                                        style={styles.rightIcon}/>
-                                </TouchableOpacity>
-                                {
-                                    (!item.Status)?
-                                    <TouchableOpacity 
-                                        onPress={()=>this.clickOnEdit(item)}
-                                        activeOpacity={0.7}>
-                                        <Image
-                                            source={EDIT_ICON}
-                                            style={styles.rightIcon}/>
-                                    </TouchableOpacity>:null
-                                }
-                                
-                            </View>
-                        )}>
-                        </FlatList>  
-                        {this.renderActionButton()}        
-                </View>     
-                          
+                        renderItem={({item})=>this.renderFlatListItem(item)}>
+                        </FlatList>     
+                        <AppStatusBar/>
+                    {this.renderActionButton()} 
+                </View>  
             );
         }        
     }
+    
 }
+export default connect(mapStateToProps)(TaskList);
 
 const styles = StyleSheet.create({
     containerMain:{
@@ -219,6 +204,5 @@ const styles = StyleSheet.create({
         fontSize: 20,
         height: 22,
         color: appcolors.ThemeWhiteColor,
-    
-      },
+      }
 });
