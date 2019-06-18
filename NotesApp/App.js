@@ -1,4 +1,4 @@
-import {Image,StyleSheet,Text, View} from 'react-native';
+import {Image,StyleSheet,Text, View, Platform} from 'react-native';
 import React from 'react';
 import {Actions,ActionConst, Scene, Router, Tabs, Stack} from 'react-native-router-flux'
 import taskView from './src/screens';
@@ -55,11 +55,18 @@ const styles = StyleSheet.create({
     color:appcolors.ThemeWhiteColor,
     fontFamily:globals.FONT_LATO_BOLD,
     fontSize: 20
+  },
+  customNavBar:{
+    backgroundColor:appcolors.ThemeColor,
+    height:(Platform.OS=='android')?50:90,
+    flexDirection:'row',
+    justifyContent:'flex-end',
+    alignItems:'flex-end'
   }
 });
 
 const NavigationBar=()=>{
-return(<View style={{backgroundColor:appcolors.ThemeColor, height:90, flexDirection:'row', justifyContent:'flex-end', alignItems:'flex-end'}}>
+return(<View style={[styles.customNavBar,{backgroundColor:appcolors.ThemeColor}]}>
           <Text style={[styles.barTitleStyle,{flex:1, textAlign:'center', marginLeft:30, marginBottom:5}]}>{localizedString.main_task_header}</Text>
           <MenuOption/>
        </View>)

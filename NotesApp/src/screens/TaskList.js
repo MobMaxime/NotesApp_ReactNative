@@ -172,7 +172,12 @@ const styles = StyleSheet.create({
         alignItems:'center',
         borderRadius:5,
         borderWidth:1,
-        borderColor:appcolors.ThemeLightGrayColor,        
+        borderColor:appcolors.ThemeLightGrayColor,
+        elevation:4,
+        shadowOffset: { width: 5, height: 5 },
+        shadowColor: "grey",
+        shadowOpacity: 0.5,
+        shadowRadius: 10        
     },
     leftIcon:{
         width:40,
